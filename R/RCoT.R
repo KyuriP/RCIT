@@ -39,14 +39,14 @@ RCoT <- function(x, y, z = NULL, suffStat, approx = "lpd4", num_f = 100, num_f2 
     out <- RIT(x_data, y_data, approx = approx, seed = seed)
     return(out)
   } else {
-    # Handle conditional independence with RCoT
-    x_data <- matrix2(x_data)
-    y_data <- matrix2(y_data)
-    z_data <- matrix2(z_data)
+    # # Handle conditional independence with RCoT
+    # x_data <- matrix2(x_data)
+    # y_data <- matrix2(y_data)
+    # z_data <- matrix2(z_data)
     
     # Filter out columns of z with zero standard deviation
     z_data <- z_data[, apply(z_data, 2, sd) > 0]
-    z_data <- matrix2(z_data)
+    # z_data <- matrix2(z_data)
     d <- ncol(z_data)
     
     if (length(z_data) == 0) {
