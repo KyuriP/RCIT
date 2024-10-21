@@ -53,7 +53,8 @@ RCoT <- function(x, y, z = NULL, suffStat, approx = "lpd4", num_f = 100, num_f2 
       out <- RIT(x_data, y_data, suffStat = suffStat, approx = approx, seed = seed)
       return(out)
     } else if (sd(x_data) == 0 | sd(y_data) == 0) {
-      return(list(p = 1, Sta = 0))
+      # return(list(p = 1, Sta = 0))
+      return(p = 1) # just pval
     }
     
     r <- nrow(x_data)

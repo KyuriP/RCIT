@@ -46,7 +46,8 @@ RCIT <- function(x, y, z = NULL, suffStat, approx = "lpd4", num_f = 100, num_f2 
       return(out)
     } else if (sd(x_data) == 0 | sd(y_data) == 0) {
       # If either x or y has zero variance
-      out = list(p = 1, Sta = 0)
+      # out = list(p = 1, Sta = 0) # just p val
+      out = p
       return(out)
     }
     
