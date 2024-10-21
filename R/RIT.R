@@ -23,8 +23,8 @@ RIT <- function(x,y,approx="lpd4",seed=NULL){
     return(out$p)
   }
   
-  # x=matrix2(x);
-  # y=matrix2(y);
+  x=as.matrix(x);
+  y=as.matrix(y);
   
   
   r=nrow(x);
