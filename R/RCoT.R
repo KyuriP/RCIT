@@ -36,7 +36,7 @@ RCoT <- function(x, y, z = NULL, suffStat, approx = "lpd4", num_f = 100, num_f2 
   
   # If z is empty, call RIT for unconditional independence
   if (length(z_data) == 0) {
-    out <- RIT(x_data, y_data, suffStat = suffStat, approx = approx, seed = seed)
+    out <- RIT(x, y, suffStat = suffStat, approx = approx, seed = seed)
     return(out)
   } else {
     # Handle conditional independence with RCoT
@@ -50,7 +50,7 @@ RCoT <- function(x, y, z = NULL, suffStat, approx = "lpd4", num_f = 100, num_f2 
     d <- ncol(z_data)
     
     if (length(z_data) == 0) {
-      out <- RIT(x_data, y_data, suffStat = suffStat, approx = approx, seed = seed)
+      out <- RIT(x, y, suffStat = suffStat, approx = approx, seed = seed)
       return(out)
     } else if (sd(x_data) == 0 | sd(y_data) == 0) {
       return(list(p = 1, Sta = 0))
