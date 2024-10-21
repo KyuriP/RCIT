@@ -151,7 +151,8 @@ RCoT <- function(x,y,z=NULL,approx="lpd4",num_f=100,num_f2=5,seed=NULL){
 
     if (p<0) p=0;
 
-    out=list(p=p,Sta=Sta);
+    # out=list(p=p,Sta=Sta);
+    out = p # extract pval only
     return(out)
   }
   
