@@ -16,86 +16,87 @@
 #' y=(x+rnorm(1000))^2;
 #' RIT(x,y);
 
-RIT <- function(x, y, suffStat, approx = "lpd4", seed = NULL) {
+RIT <- function(x,y,approx="lpd4",seed=NULL){
   
-  # Extract the data columns for x and y based on indices
-  x_data <- suffStat$data[, x]
-  y_data <- suffStat$data[, y]
-  
-  # Check for constant columns (zero variance)
-  if (sd(x_data) == 0 | sd(y_data) == 0) {
-    out = list(p = 1, Sta = 0)
+  if (sd(x)==0 | sd(y)==0){
+    out=list(p=1,Sta=0,w=w,b=b);
     return(out$p)
   }
   
-  # Convert x and y to matrices
-  x_data = matrix2(x_data)
-  y_data = matrix2(y_data)
+  x=matrix2(x);
+  y=matrix2(y);
   
-  r = nrow(x_data)
-  if (r > 500) {
-    r1 = 500
-  } else {
-    r1 = r
-  }
   
-  # Normalize x and y
-  x_data = normalize(x_data)
-  y_data = normalize(y_data)
+  r=nrow(x);
+  if (r>500){
+    r1=500
+  } else {r1=r;}
   
-  # Generate random Fourier features for x and y
-  four_x = random_fourier_features(x_data, num_f = 5, sigma = median(c(t(dist(x_data[1:r1,])))), seed = seed)
-  four_y = random_fourier_features(y_data, num_f = 5, sigma = median(c(t(dist(y_data[1:r1,])))), seed = seed)
+  x=normalize(x);
+  y=normalize(y);
   
-  # Normalize the Fourier features
-  f_x = normalize(four_x$feat) # stabilizes computations
-  f_y = normalize(four_y$feat) # stabilizes computations
+  four_x = random_fourier_features(x,num_f=5,sigma=median(c(t(dist(x[1:r1,])))), seed = seed );
+  four_y = random_fourier_features(y,num_f=5,sigma=median(c(t(dist(y[1:r1,])))), seed = seed );
   
-  # Compute covariance
-  Cxy = cov(f_x, f_y)
-  Sta = r * sum(Cxy^2)
+  f_x=normalize(four_x$feat); #stabilizes computations
+  f_y=normalize(four_y$feat); #stabilizes computations
   
-  # Approximate null distributions
-  if (approx == "perm") {
-    nperm = 1000
-    Stas = c()
-    for (ps in 1:nperm) {
-      perm = sample(1:r, r)
-      Sta_p = Sta_perm(f_x[perm, ], f_y, r)
-      Stas = c(Stas, Sta_p)
-    }
-    p = 1 - (sum(Sta >= Stas) / length(Stas))
-  } else {
-    res_x = f_x - repmat(t(matrix(colMeans(f_x))), r, 1)
-    res_y = f_y - repmat(t(matrix(colMeans(f_y))), r, 1)
+  Cxy=cov(f_x,f_y);
+  
+  Sta = r*sum(Cxy^2);
+  
+  #approximate null distributions
+  
+  if (approx == "perm"){
+    nperm =1000;
     
-    d = expand.grid(1:ncol(f_x), 1:ncol(f_y))
-    res = res_x[, d[, 1]] * res_y[, d[, 2]]
-    Cov = 1 / r * (t(res) %*% res)
-    
-    if (approx == "chi2") {
-      i_Cov = ginv(Cov)
-      Sta = r * (c(Cxy) %*% i_Cov %*% c(Cxy))
-      p = 1 - pchisq(Sta, length(c(Cxy)))
-    } else {
-      eig_d = eigen(Cov)
-      eig_d$values = eig_d$values[eig_d$values > 0]
+    Stas = c();
+    for (ps in 1:nperm){
+      perm = sample(1:r,r);
+      Sta_p = Sta_perm(f_x[perm,],f_y,r)
+      Stas = c(Stas, Sta_p);
       
-      if (approx == "gamma") {
-        p = 1 - sw(eig_d$values, Sta)
+    }
+    
+    p = 1-(sum(Sta >= Stas)/length(Stas));
+    
+  } else{
+    
+    res_x = f_x-repmat(t(matrix(colMeans(f_x))),r,1);
+    res_y = f_y-repmat(t(matrix(colMeans(f_y))),r,1);
+    
+    d =expand.grid(1:ncol(f_x),1:ncol(f_y));
+    res = res_x[,d[,1]]*res_y[,d[,2]];
+    Cov = 1/r * (t(res)%*%res);
+    
+    if (approx == "chi2"){
+      i_Cov = ginv(Cov)
+      
+      Sta = r * (c(Cxy)%*%  i_Cov %*% c(Cxy) );
+      p = 1-pchisq(Sta, length(c(Cxy)));
+    } else{
+      
+      eig_d = eigen(Cov);
+      eig_d$values=eig_d$values[eig_d$values>0];
+      
+      if (approx == "gamma"){
+        p=1-sw(eig_d$values,Sta);
+        
       } else if (approx == "hbe") {
-        p = 1 - hbe(eig_d$values, Sta)
-      } else if (approx == "lpd4") {
-        eig_d_values = eig_d$values
-        p = try(1 - lpb4(eig_d_values, Sta), silent = TRUE)
-        if (!is.numeric(p) | is.nan(p)) {
-          p = 1 - hbe(eig_d$values, Sta)
+        
+        p=1-hbe(eig_d$values,Sta);
+        
+      } else if (approx == "lpd4"){
+        eig_d_values=eig_d$values;
+        p=try(1-lpb4(eig_d_values,Sta), silent=TRUE);
+        if (!is.numeric(p)  | is.nan(p)){
+          p=1-hbe(eig_d$values,Sta);
         }
       }
     }
   }
   
-  if (p < 0) p = 0
+  if (p<0) p=0;
   
   # out=list(p=p,Sta=Sta);
   out = p # extract pval only
