@@ -30,7 +30,7 @@ RCIT <- function(x, y, z = NULL, suffStat, approx = "lpd4", num_f = 100, num_f2 
   
   if (length(z) == 0) {
     # If no conditioning set, perform unconditional independence test (RIT)
-    out = RIT(x_data, y_data, approx = approx, seed = seed)
+    out = RIT(x_data, y_data, suffStat = suffStat, approx = approx, seed = seed)
     return(out)
   } else {
     # Extract z columns if present
@@ -42,7 +42,7 @@ RCIT <- function(x, y, z = NULL, suffStat, approx = "lpd4", num_f = 100, num_f2 
     
     if (d == 0) {
       # If z has no valid columns left, fall back to RIT
-      out = RIT(x_data, y_data, approx = approx, seed = seed)
+      out = RIT(x_data, y_data, suffStat = suffStat, approx = approx, seed = seed)
       return(out)
     } else if (sd(x_data) == 0 | sd(y_data) == 0) {
       # If either x or y has zero variance
