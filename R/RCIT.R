@@ -126,6 +126,14 @@ RCIT <- function(x, y, z = NULL, suffStat, approx = "lpd4", num_f = 100, num_f2 
         p = 1 - pchisq(Sta, length(c(Cxy_z)))
       } else {
         eig_d = eigen(Cov, symmetric = TRUE)
+        
+        # Check if there are complex eigenvalues and handle them appropriately
+        if (any(Im(eig_d$values) != 0)) {
+          warning("Complex eigenvalues detected, using real part only.")
+          eig_d$values = Re(eig_d$values)  # Use the real part of the eigenvalues
+        }
+        
+        # Filter out negative or zero eigenvalues (real part only)
         eig_d$values = eig_d$values[eig_d$values > 0]
         
         if (approx == "gamma") {
