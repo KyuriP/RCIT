@@ -77,8 +77,16 @@ RIT <- function(x,y,approx="lpd4",seed=NULL){
     } else{
       
       eig_d = eigen(Cov);
-      eig_d$values=eig_d$values[eig_d$values>0];
       
+      # Check if there are complex eigenvalues and handle them appropriately
+      if (any(Im(eig_d$values) != 0)) {
+        warning("Complex eigenvalues detected, using real part only.")
+        eig_d$values = Re(eig_d$values)  # Use the real part of the eigenvalues
+      }
+      
+      # Filter out negative or zero eigenvalues (real part only)
+      eig_d$values = eig_d$values[eig_d$values > 0]
+
       if (approx == "gamma"){
         p=1-sw(eig_d$values,Sta);
         
